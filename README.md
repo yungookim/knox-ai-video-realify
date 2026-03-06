@@ -1,6 +1,6 @@
 # Realify - UGC Video Post-Processor
 
-A web app that processes uploaded videos to feel more like native UGC content by applying subtle film grain, ambient audio beds, 1080p export, and optional social-like compression.
+Upload AI-generated videos to make them feel more like natural UGC content by applying subtle film grain, ambient audio beds, 1080p export, and optional social-like compression. Inspired by [this post](https://x.com/dygk_0x1/status/2029665030430453872).
 
 ## Prerequisites
 
