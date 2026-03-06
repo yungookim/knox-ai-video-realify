@@ -4,7 +4,11 @@ import { ProbeResult } from './types';
 export function probeVideo(filePath: string): Promise<ProbeResult> {
   return new Promise((resolve, reject) => {
     ffmpeg.ffprobe(filePath, (err, metadata) => {
-      if (err) return reject(err);
+      if (err) {
+        const msg = `ffprobe failed for "${filePath}": ${err.message || err}`;
+        console.error(`[probe] ${msg}`);
+        return reject(new Error(msg));
+      }
 
       const videoStream = metadata.streams.find((s) => s.codec_type === 'video');
       const audioStream = metadata.streams.find((s) => s.codec_type === 'audio');

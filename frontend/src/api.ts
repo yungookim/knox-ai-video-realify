@@ -29,17 +29,24 @@ export async function createJob(
   formData.append('ambience_level', params.ambience_level);
   formData.append('compression_enabled', String(params.compression_enabled));
 
+  console.log('[api] POST /api/jobs', { fileName: file.name, fileSize: file.size, ...params });
   const res = await fetch('/api/jobs', { method: 'POST', body: formData });
   if (!res.ok) {
     const body = await res.json();
+    console.error('[api] POST /api/jobs failed:', res.status, body);
     throw new Error(body.message || body.error || 'Upload failed');
   }
-  return res.json();
+  const result = await res.json();
+  console.log('[api] Job created:', result.job_id);
+  return result;
 }
 
 export async function getJobStatus(jobId: string): Promise<JobStatus> {
   const res = await fetch(`/api/jobs/${jobId}`);
-  if (!res.ok) throw new Error('Failed to fetch job status');
+  if (!res.ok) {
+    console.error(`[api] GET /api/jobs/${jobId} failed:`, res.status);
+    throw new Error('Failed to fetch job status');
+  }
   return res.json();
 }
 

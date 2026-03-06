@@ -35,12 +35,15 @@ const upload = multer({
 router.post('/api/jobs', upload.single('video'), async (req: Request, res: Response) => {
   try {
     if (!req.file) {
+      console.warn('[upload] No video file in request');
       res.status(400).json({ error: 'No video file provided' });
       return;
     }
 
     const jobId = uuidv4();
     const ext = path.extname(req.file.originalname).toLowerCase();
+
+    console.log(`[upload] jobId=${jobId} file="${req.file.originalname}" size=${req.file.size} ext=${ext}`);
 
     // Parse params from body
     const presetId: PresetId = req.body.preset_id === 'ugc-medium' ? 'ugc-medium' : 'ugc-light';
@@ -58,22 +61,26 @@ router.post('/api/jobs', upload.single('video'), async (req: Request, res: Respo
     fs.renameSync(req.file.path, destPath);
 
     // Probe and validate
+    console.log(`[upload] jobId=${jobId} probing file: ${destPath}`);
     let probe;
     try {
       probe = await probeVideo(destPath);
+      console.log(`[upload] jobId=${jobId} probe result: ${probe.width}x${probe.height} ${probe.videoCodec} ${probe.duration}s hasAudio=${probe.hasAudio}`);
     } catch (err: unknown) {
       const error = err as Error;
+      console.error(`[upload] jobId=${jobId} probe failed:`, error.message, error.stack);
       // Clean up uploaded file
       try { fs.unlinkSync(destPath); } catch { /* ignore */ }
       if (error.message === 'NO_VIDEO_STREAM') {
         res.status(400).json({ error: 'NO_VIDEO_STREAM', message: 'File does not contain a video stream' });
         return;
       }
-      res.status(400).json({ error: 'INVALID_FORMAT', message: 'Could not read video file' });
+      res.status(400).json({ error: 'INVALID_FORMAT', message: `Could not read video file: ${error.message}` });
       return;
     }
 
     if (probe.duration > config.maxDurationSeconds) {
+      console.warn(`[upload] jobId=${jobId} duration ${probe.duration}s exceeds max ${config.maxDurationSeconds}s`);
       try { fs.unlinkSync(destPath); } catch { /* ignore */ }
       res.status(400).json({
         error: 'DURATION_LIMIT_EXCEEDED',
@@ -84,6 +91,7 @@ router.post('/api/jobs', upload.single('video'), async (req: Request, res: Respo
 
     const validCodecs = ['h264', 'hevc', 'h265'];
     if (!validCodecs.includes(probe.videoCodec)) {
+      console.warn(`[upload] jobId=${jobId} unsupported codec: ${probe.videoCodec}`);
       try { fs.unlinkSync(destPath); } catch { /* ignore */ }
       res.status(400).json({
         error: 'INVALID_FORMAT',
@@ -96,14 +104,17 @@ router.post('/api/jobs', upload.single('video'), async (req: Request, res: Respo
     const resolved = resolveParams(presetId, grain, ambienceType, ambienceLevel, compressionEnabled);
 
     // Create job in DB
+    console.log(`[upload] jobId=${jobId} inserting into DB, preset=${presetId} grain=${grain} ambience=${ambienceType}/${ambienceLevel} compression=${compressionEnabled}`);
     db.prepare(`
       INSERT INTO jobs (job_id, status, progress, input_video_uri, preset_id, preset_version, params_resolved)
       VALUES (?, 'queued', 0, ?, ?, ?, ?)
     `).run(jobId, destPath, resolved.preset_id, resolved.preset_version, JSON.stringify(resolved));
 
     // Queue the job
+    console.log(`[upload] jobId=${jobId} adding to queue`);
     await queue.add('process', { jobId }, { jobId });
 
+    console.log(`[upload] jobId=${jobId} created successfully`);
     res.status(201).json({ job_id: jobId });
   } catch (err: unknown) {
     const error = err as Error;

@@ -20,6 +20,16 @@ if (config.nodeEnv === 'production') {
   app.use(express.static(frontendDist));
 }
 
+// Request logging
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    console.log(`[http] ${req.method} ${req.path} ${res.statusCode} ${duration}ms`);
+  });
+  next();
+});
+
 // API routes
 app.use(routes);
 
@@ -31,17 +41,19 @@ if (config.nodeEnv === 'production') {
   });
 }
 
-// Error handling for multer
+// Error handling for multer and other middleware errors
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  console.error(`[error] Middleware error: ${err.message}`);
   if (err.message.startsWith('INVALID_FORMAT')) {
     res.status(400).json({ error: 'INVALID_FORMAT', message: err.message });
     return;
   }
   if (err.message.includes('File too large')) {
+    console.warn(`[error] File too large (max ${config.maxFileSizeMb}MB)`);
     res.status(400).json({ error: 'FILE_TOO_LARGE', message: `Max file size is ${config.maxFileSizeMb}MB` });
     return;
   }
-  console.error('Unhandled error:', err);
+  console.error('[error] Unhandled error stack:', err.stack);
   res.status(500).json({ error: 'INTERNAL', message: 'Internal server error' });
 });
 

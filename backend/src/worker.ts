@@ -213,6 +213,8 @@ async function processJob(jobId: string): Promise<void> {
     });
   } catch (err: unknown) {
     const error = err as Error & { code?: string };
+    console.error(`[worker] jobId=${jobId} processing failed: [${error.code || 'ENCODE_FAILED'}] ${error.message}`);
+    console.error(`[worker] jobId=${jobId} stack:`, error.stack);
     updateJob(jobId, {
       status: 'failed',
       error_code: error.code || 'ENCODE_FAILED',
