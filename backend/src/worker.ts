@@ -126,14 +126,22 @@ function runFfmpeg(args: string[], logFile: string): Promise<void> {
     logStream.write(`\n--- ffmpeg ${args.join(' ')}\n`);
 
     const proc = spawn('ffmpeg', args, { stdio: ['pipe', 'pipe', 'pipe'] });
+    const stderrChunks: string[] = [];
 
     proc.stdout?.on('data', (d: Buffer) => logStream.write(d));
-    proc.stderr?.on('data', (d: Buffer) => logStream.write(d));
+    proc.stderr?.on('data', (d: Buffer) => {
+      logStream.write(d);
+      stderrChunks.push(d.toString());
+    });
 
     proc.on('close', (code) => {
       logStream.end();
       if (code === 0) resolve();
-      else reject(new Error(`ffmpeg exited with code ${code}`));
+      else {
+        const fullStderr = stderrChunks.join('');
+        const lastLines = fullStderr.split('\n').filter(l => l.trim()).slice(-5).join('\n');
+        reject(new Error(`ffmpeg exited with code ${code}:\n${lastLines}`));
+      }
     });
 
     proc.on('error', (err) => {
