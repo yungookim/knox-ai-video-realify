@@ -1,10 +1,24 @@
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
+import { execSync } from 'child_process';
 import { config } from './config';
 import routes from './routes';
 import { startWorker } from './worker';
 import { ensureDir } from './storage';
+
+// Check for ffmpeg/ffprobe at startup
+for (const bin of ['ffmpeg', 'ffprobe']) {
+  try {
+    execSync(`which ${bin}`, { stdio: 'pipe' });
+    console.log(`[startup] ${bin} found`);
+  } catch {
+    console.error(`[startup] ERROR: "${bin}" not found in PATH. Install ffmpeg: https://ffmpeg.org/download.html`);
+    console.error(`[startup] On macOS: brew install ffmpeg`);
+    console.error(`[startup] On Ubuntu: sudo apt install ffmpeg`);
+    process.exit(1);
+  }
+}
 
 const app = express();
 

@@ -25,7 +25,7 @@ const durationFormatted = computed(() => {
 
 <template>
   <div class="text-center py-12">
-    <svg class="w-14 h-14 mx-auto text-green-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg class="w-14 h-14 mx-auto text-white mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
     </svg>
 
@@ -33,7 +33,7 @@ const durationFormatted = computed(() => {
     <p class="text-gray-500 text-sm mb-8">Your video has been processed and is ready to download.</p>
 
     <!-- Output details -->
-    <div class="bg-gray-900 border border-gray-800 rounded-xl p-6 max-w-sm mx-auto mb-8">
+    <div class="bg-gray-900 border border-gray-800 p-6 max-w-sm mx-auto mb-8">
       <div class="grid grid-cols-3 gap-4 text-center">
         <div>
           <p class="text-gray-500 text-xs uppercase tracking-wide">Resolution</p>
@@ -53,13 +53,13 @@ const durationFormatted = computed(() => {
     <div class="flex gap-3 justify-center">
       <a
         :href="downloadUrl"
-        class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 rounded-lg font-medium transition-colors inline-block"
+        class="px-6 py-3 bg-white hover:bg-gray-200 text-black font-medium transition-colors inline-block"
       >
         Download MP4
       </a>
       <button
         @click="emit('reset')"
-        class="px-6 py-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg font-medium transition-colors"
+        class="px-6 py-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 font-medium transition-colors"
       >
         Process Another
       </button>

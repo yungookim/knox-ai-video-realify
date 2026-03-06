@@ -28,11 +28,11 @@ const progressText = computed(() => {
 
 <template>
   <div class="text-center py-16">
-    <div class="inline-block w-10 h-10 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin mb-6"></div>
+    <div class="inline-block w-10 h-10 border-2 border-white border-t-transparent animate-spin mb-6"></div>
 
     <div class="space-y-4">
       <div>
-        <span class="inline-block px-3 py-1 bg-indigo-900/50 border border-indigo-700 rounded-full text-indigo-300 text-sm font-medium">
+        <span class="inline-block px-3 py-1 bg-gray-900 border border-gray-600 text-white text-sm font-medium">
           {{ statusLabel }}
         </span>
       </div>
@@ -41,9 +41,9 @@ const progressText = computed(() => {
 
       <!-- Progress bar -->
       <div class="max-w-md mx-auto">
-        <div class="bg-gray-800 rounded-full h-2 overflow-hidden">
+        <div class="bg-gray-800 h-2 overflow-hidden">
           <div
-            class="bg-indigo-500 h-full rounded-full transition-all duration-500 ease-out"
+            class="bg-white h-full transition-all duration-500 ease-out"
             :style="{ width: `${status.progress}%` }"
           ></div>
         </div>

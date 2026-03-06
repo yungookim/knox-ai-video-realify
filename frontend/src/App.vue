@@ -71,7 +71,7 @@ function reset() {
     <header class="border-b border-gray-800 px-6 py-4">
       <div class="max-w-2xl mx-auto flex items-center justify-between">
         <h1 class="text-xl font-bold tracking-tight">
-          <span class="text-indigo-400">Realify</span>
+          <span class="text-white">Realify</span>
           <span class="text-gray-500 text-sm font-normal ml-2">UGC Video Post-Processor</span>
         </h1>
       </div>
@@ -89,7 +89,7 @@ function reset() {
           :status="jobStatus"
         />
         <div v-if="step === 'processing' && !jobStatus" class="text-center py-20">
-          <div class="inline-block w-8 h-8 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin"></div>
+          <div class="inline-block w-8 h-8 border-2 border-white border-t-transparent animate-spin"></div>
           <p class="mt-4 text-gray-400">Submitting job...</p>
         </div>
 
@@ -101,12 +101,12 @@ function reset() {
         />
 
         <div v-if="step === 'error'" class="text-center py-20">
-          <div class="bg-red-900/30 border border-red-700 rounded-lg p-6 max-w-md mx-auto">
-            <p class="text-red-300 font-medium">Error</p>
-            <p class="text-red-400 mt-2 text-sm">{{ errorMessage }}</p>
+          <div class="bg-gray-900 border border-gray-600 p-6 max-w-md mx-auto">
+            <p class="text-white font-medium">Error</p>
+            <p class="text-gray-400 mt-2 text-sm">{{ errorMessage }}</p>
             <button
               @click="reset"
-              class="mt-4 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded text-sm transition-colors"
+              class="mt-4 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-sm transition-colors"
             >
               Try Again
             </button>
