@@ -55,8 +55,8 @@ function buildFfmpegArgs(
   if (params.grain_strength > 0) {
     // Use noise filter for grain
     const strength = params.grain_strength;
-    const temporal = params.grain_temporal ? ':t=1' : '';
-    videoFilters.push(`noise=alls=${strength}:allf=t${temporal}`);
+    const flags = params.grain_temporal ? ':allf=t' : '';
+    videoFilters.push(`noise=alls=${strength}${flags}`);
   }
 
   // Ambience mixing
